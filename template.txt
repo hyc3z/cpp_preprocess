@@ -1,0 +1,26 @@
+#include <nvml.h>
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+//#include "nvml-subset.h"
+
+static void *dev_handle = nullptr;
+
+static void LoadLibrary() {
+    dev_handle = dlopen("/usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1.orig", RTLD_NOW | RTLD_LOCAL);
+	if (!dev_handle) {
+		exit(1);
+	}
+}
+
+template<typename T>
+static T LoadSymbol(const char *symbol_name) {
+	if (!dev_handle) LoadLibrary();
+	void *symbol = dlsym(dev_handle, symbol_name);
+	return reinterpret_cast<T>(symbol);
+}
+
+nvmlReturn_t GetSymbolNotFoundError() {
+    // TO DO Return error.
+	return NVML_ERROR_LIBRARY_NOT_FOUND;
+}
